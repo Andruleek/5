@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import datetime
+import sys
 
 async def fetch_exchange_rate(session, date):
     url = f"https://api.privatbank.ua/p24api/exchange_rates?json&date={date.strftime('%d.%m.%Y')}&exchange=&coursid=5"
@@ -23,7 +24,7 @@ def print_exchange_rates(data):
         eur_rate = next((x['saleRate'] for x in rates['exchangeRate'] if x['currency'] == 'EUR'), None)
         usd_rate = next((x['saleRate'] for x in rates['exchangeRate'] if x['currency'] == 'USD'), None)
         if eur_rate is not None and usd_rate is not None:
-            print(f"On {date}: EUR rate - {eur_rate}, USD rate - {usd_rate}")
+            print(f"On {date}: EUR rate - {eur_rate:.2f}, USD rate - {usd_rate:.2f}")
         else:
             print(f"On {date}: Data not available for EUR and USD")
 
@@ -33,6 +34,12 @@ async def main():
         print_exchange_rates(data)
     except Exception as e:
         print(f"An error occurred: {e}")
+        # Optionally, print stack trace:
+        # import traceback
+        # traceback.print_exc()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    if len(sys.argv) != 1:
+        print("Usage: python main.py")
+    else:
+        asyncio.run(main())
